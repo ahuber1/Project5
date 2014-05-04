@@ -12,7 +12,7 @@ public class Driver {
 		int indexVal = 0;
 		
 		for(int index = 0; index < i.length; index++) {
-			for(int index2 = 0; index2 < j.lengthl index2++) {
+			for(int index2 = 0; index2 < j.length; index2++) {
 				handlers[indexVal] = new Handler(indexVal + 1, i[index], j[index2]);
 				threads[indexVal] = new Thread(handlers[indexVal]);
 				threads[indexVal].start();
