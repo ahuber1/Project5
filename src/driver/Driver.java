@@ -21,7 +21,7 @@ public class Driver {
 				threads[index].join();
 			}
 			catch (Exception e) {
-				
+				e.printStackTrace();
 			}
 		}
 	}
