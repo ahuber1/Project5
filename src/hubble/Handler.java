@@ -41,7 +41,7 @@ public class Handler implements Runnable {
 	public String toString() {
 		String line1 = String.format("Run #%d: i=%d,j=%d,N=%d,B1=%s,B2=%s,T=%d", runNum, i, j, n, b1, b2, t);
 		String line2 = String.format("Time mergesort: %1.1fsec", processor.time());
-		String line3 = String.format("Saving image: images/%s", processor.path());
+		String line3 = String.format("Saving image: %s", processor.path());
 		return String.format("%s\n%s\n%s\n", line1, line2, line3);
 	}
 	
