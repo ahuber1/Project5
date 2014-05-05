@@ -7,6 +7,8 @@ import java.util.concurrent.atomic.AtomicIntegerArray;
 
 import javax.imageio.ImageIO;
 
+// TODO "T" is used to determine when to stop splitting the array in mergesort; perform mergesort ALWAYS
+
 /**
  * Processes the data that a {@link Reciever} recieved
  * @author Andrew Huber
