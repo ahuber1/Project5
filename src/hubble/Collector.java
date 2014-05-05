@@ -3,6 +3,8 @@ package hubble;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+// TODO see if we should rename this to "Satellite"
+
 /**
  * This generates random numbers and stores them in a buffer, which simulates
  * data transmission with the Hubble Space Telescope
