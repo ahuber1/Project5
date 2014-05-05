@@ -35,6 +35,8 @@ public class Buffer {
 	 * @param runnable A runnable that will be called when N<sup>2</sup> items have been added; if you
 	 * want no task to be performed at that time, pass in {@code null}
 	 */
+	 
+	 // TODO Do not require "n"; replace with size
 	public Buffer(int n, Runnable runnable) {
 		this.n = n;
 		this.size = n * n * 2;
