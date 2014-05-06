@@ -1,6 +1,14 @@
 package driver;
 
-import hubble.Handler;
+import hubble.Buffer;
+import hubble.Collector;
+import hubble.Reciever;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ForkJoinPool;
 
 public class Driver {
 	
@@ -8,45 +16,35 @@ public class Driver {
 		// All the possible values for i
 		int[] i = {8, 9, 10, 11};
 		
-		// ALl the possible values for j
+		// All the possible values for j
 		int[] j = {1, 2, 3, 4, 5};
 		
-		// All of the Handlers that will be generated
-		Handler[] handlers = new Handler[i.length * j.length];
+		ExecutorService service = new ForkJoinPool();
+		Set<Callable<String>> callables = new HashSet<Callable<String>>();
+		Collector collector = new Collector();
 		
-		// All of the threads that will execute
-		Thread[] threads = new Thread[i.length * j.length];
+		callables.add(collector);
 		
-		// Used to place Handler and Thread objects into "handlers" and "threads", respectively
-		int indexVal = 0;
-		
-		// For every possible i and j combination, create a handler with that combination, create a Thread
-		// using that Handler, and run the handler.
-		//
-		// FOR TESTING PURPOSES, I AM ONLY RUNNING THE FIRST THREAD THIS LOOP GENERATES!!!
-		for(int index = 0; index < i.length; index++) {
-			for(int index2 = 0; index2 < j.length; index2++) {
-				handlers[indexVal] = new Handler(indexVal + 1, i[index], j[index2]);
-				threads[indexVal] = new Thread(handlers[indexVal], String.format("i=%d j=%d)", i[index], j[index2]));
+		for(int a = 0; a < i.length; a++) {
+			
+			int n = (int) Math.pow(2, i[a]);
+			
+			for(int b = 0; b < j.length; b++) {
+				int t = (int) Math.pow(10, j[b]);
+				Buffer b1 = new Buffer(n * n * 2);
+				Buffer b2 = new Buffer(n * n);
+				Reciever rec = new Reciever(b1, b2, n, t);
 				
-				if(indexVal == 0)
-					threads[indexVal].start();
-				
-				indexVal++;
+				collector.addBuffer(b1);
+				callables.add(rec);
 			}
 		}
 		
-		// Join all the threads
-		//
-		// FOR TESTING PURPOSES, I AM ONLY WAITING FOR THE FIRST THREAD TO DIE!!!
-		for(int index = 0; index < threads.length; index++) {
-			try {
-				if(index == 0)
-					threads[index].join();
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
-		}	
+		try {
+			service.invokeAll(callables);
+			service.wait();
+		} catch (Exception e) {
+		 e.printStackTrace();
+		}
 	}
 }

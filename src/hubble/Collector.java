@@ -1,6 +1,8 @@
 package hubble;
 
+import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 // TODO see if we should rename this to "Satellite"
@@ -11,7 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Andrew Huber
  *
  */
-public class Collector implements Runnable {
+public class Collector implements Callable<String> {
 	
 	/**
 	 * The smallest number that this Collector's random number generator can generate.
@@ -31,8 +33,8 @@ public class Collector implements Runnable {
 	 */
 	public static final int B = 4096;
 	
-	/** Buffer B1 as specified in the project document */
-	private Buffer b1;
+	private ArrayList<Buffer> buffers;
+	
 	
 	/** Keeps track of when the data generation process should stop */
 	private AtomicBoolean stop;
@@ -40,12 +42,18 @@ public class Collector implements Runnable {
 	/**
 	 * Creates a new collector that will generate random numbers and store them in a buffer, simulating
 	 * the data transmission process found on the Hubble Space Telescope.
-	 * @param n the value N as described in the project document
-	 * @param b1 the buffer B1 as described in the project document
 	 */
-	public Collector(int n, Buffer b1) {
-		this.b1 = b1;
+	public Collector() {
 		this.stop = new AtomicBoolean(false);
+		this.buffers = new ArrayList<Buffer>();
+	}
+	
+	/**
+	 * Adds a buffer that this collector will put data into
+	 * @param buffer The buffer to add
+	 */
+	public void addBuffer(Buffer buffer) {
+		buffers.add(buffer);
 	}
 	
 	/**
@@ -54,23 +62,21 @@ public class Collector implements Runnable {
 	public void stop() {
 		stop.set(true);
 	}
-	
-	/**
-	 * Begins the data generation process
-	 */
+
 	@Override
-	public void run() {
-		try {
-			Random generator = new Random();
+	public String call() throws Exception {
+		Random generator = new Random();
+		
+		while(stop.get() == false) {
+			//int delay = generator.nextInt(190 + 1) + 10;
+			int value = generator.nextInt(B + 1);
+			//Thread.sleep(delay);
 			
-			while(stop.get() == false) {
-				//int delay = generator.nextInt(190) + 10 + 1;
-				int value = generator.nextInt(B + 1);
-				//Thread.sleep(delay);
-				b1.add(value);
+			for(Buffer b: buffers) {
+				b.add(value);
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
+		
+		return "Finished collecting data...";
 	}
 }

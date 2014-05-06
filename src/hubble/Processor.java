@@ -7,14 +7,14 @@ import java.util.concurrent.atomic.AtomicIntegerArray;
 
 import javax.imageio.ImageIO;
 
-// TODO "T" is used to determine when to stop splitting the array in mergesort; perform mergesort ALWAYS
+import util.Sorter;
 
 /**
  * Processes the data that a {@link Reciever} recieved
  * @author Andrew Huber
  *
  */
-public class Processor implements Runnable {
+public class Processor {
 
 	/** The second buffer, B2, as specified in the project document */
 	private Buffer b2;
@@ -58,21 +58,15 @@ public class Processor implements Runnable {
 	 * <li>Generates a grayscale image using the normalized data</li>
 	 * </ol>
 	 */
-	@Override
-	public void run() {
+	public void processData() {
 		try {
-			data = b2.toArray();
-			
 			long startTime = System.currentTimeMillis();
 			
-			if(b2.size() > t)
-				mergesort(0, b2.size() - 1);
-			else
-				insertionsort(0, b2.size() - 1);
-			
+			data = Sorter.mergesort(b2.toArray(), t);
+				
 			long diff = System.currentTimeMillis() - startTime;
-			sortTime = diff / 1000.0;			
 			
+			sortTime = diff / 1000.0;			
 			bytes = new byte[data.length()];
 			
 			normalize();
@@ -97,67 +91,6 @@ public class Processor implements Runnable {
 		}
 	}
 	
-	/**
-	 * Performs merge sort on {@link Processor#data} between {@code min} and 
-	 * {@code max}
-	 * @param min an index number serving as the lower bounds
-	 * @param max an index number serving as the upper bounds
-	 */
-	private void mergesort(int min, int max) {		
-		final int MIN = min;
-		final int MAX = max;
-		final int MID = (MIN + MAX) / 2;
-		
-		if(min == max) {
-			return;
-		}
-		else {
-			Thread left = new Thread(new Runnable() {
-				
-				@Override
-				public void run() {
-					mergesort(MIN, MID);
-				}
-			}, String.format("mergesort(%d, %d) -> n=%d t=%d", MIN, MID, n, t));
-			
-			Thread right = new Thread(new Runnable() {
-				
-				@Override
-				public void run() {
-					mergesort(MID + 1, MAX);
-				}
-			}, String.format("mergesort(%d, %d) -> n=%d t=%d", MIN, MID + 1, n, t));
-			
-			try {
-				left.start();
-				left.join();
-				right.start();
-				right.join();
-			} catch (Exception e) {
-				e.printStackTrace();
-				System.exit(-1);
-			}
-			
-			insertionsort(min, max);
-		}
-	}
-	
-	/**
-	 * Performs insertion sort on {@link Processor#data} between {@code min} and
-	 * @param min an index number serving as the lower bounds
-	 * @param max an index number serving as the upper bounds
-	 */
-	private void insertionsort(int min, int max) {
-		for(int i = min; i < max - 1; i++) {
-			for(int j = i + 1; j < max; j++) {
-				if(data.get(i) > data.get(j)) {
-					int temp = data.get(i);
-					data.set(i, data.get(j));
-					data.set(j, temp);
-				}
-			}
-		}
-	}
 	
 	/**
 	 * Performs the data normalization. This algorithm is based

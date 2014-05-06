@@ -1,6 +1,7 @@
 package hubble;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
 /**
@@ -12,37 +13,16 @@ public class Buffer {
 	/** The actual buffer */
 	private ConcurrentLinkedQueue<Integer> buffer;
 	
-	/** 
-	 * {@code N} provided by {@code Driver.java}; look in project
-	 * description doc for more information
-	 */
-	private int n;
-	
 	/** The maximum size of this buffer */
-	private int size;
-	
-	/** A runnable that will be called when N<sup>2</sup> items have been added */
-	private Runnable runnable;
-	
-	/** The {@linkplain Buffer#runnable runnable} will only be called once; this
-	 *  boolean flag makes sure that it is only called once. 
-	 */
-	private boolean runnableCalled;
+	private AtomicInteger size;
 	
 	/**
-	 * Creates a new Buffer to store {@code int} values
-	 * @param n provided by {@code Driver.java}; look in project description doc for more information
-	 * @param runnable A runnable that will be called when N<sup>2</sup> items have been added; if you
-	 * want no task to be performed at that time, pass in {@code null}
+	 * Creates a new Buffer of a particular size
+	 * @param size the size of the buffer
 	 */
-	 
-	 // TODO Do not require "n"; replace with size
-	public Buffer(int n, Runnable runnable) {
-		this.n = n;
-		this.size = n * n * 2;
+	public Buffer(int size) {
+		this.size = new AtomicInteger(size);
 		this.buffer = new ConcurrentLinkedQueue<Integer>();
-		this.runnable = runnable;
-		this.runnableCalled = false;
 	}
 	
 	/**
@@ -52,17 +32,12 @@ public class Buffer {
 	 * for it, {@code false} if {@code i} was unsuccessfully added to the buffer because there was no room.
 	 */
 	public synchronized boolean add(int i) {
-		if(buffer.size() == size)
+		if(buffer.size() == size.get())
 			return false;
-		
-		buffer.add(i);
-		
-		if(runnable != null && buffer.size() == n * n && runnableCalled == false) {
-			runnableCalled = true;
-			runnable.run();
+		else {
+			buffer.add(i);
+			return true;
 		}
-		
-		return true;
 	}
 	
 	/**
@@ -107,5 +82,9 @@ public class Buffer {
 	@Override
 	public synchronized String toString() {
 		return "TBD";
+	}
+
+	public int length() {
+		return size.get();
 	}
 }
