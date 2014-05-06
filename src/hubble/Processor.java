@@ -60,9 +60,10 @@ public class Processor {
 	 */
 	public void processData() {
 		try {
+			System.out.println("Processing data...");			
 			long startTime = System.currentTimeMillis();
-			
 			data = Sorter.mergesort(b2.toArray(), t);
+			System.out.println("Done sorting...");
 				
 			long diff = System.currentTimeMillis() - startTime;
 			
@@ -70,6 +71,7 @@ public class Processor {
 			bytes = new byte[data.length()];
 			
 			normalize();
+			System.out.println("Normalized...");
 			
 			File file = new File("images");
 			

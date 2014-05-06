@@ -2,7 +2,6 @@ package hubble;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 // TODO see if we should rename this to "Satellite"
@@ -13,7 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Andrew Huber
  *
  */
-public class Collector implements Callable<String> {
+public class Collector implements Runnable {
 	
 	/**
 	 * The smallest number that this Collector's random number generator can generate.
@@ -64,19 +63,30 @@ public class Collector implements Callable<String> {
 	}
 
 	@Override
-	public String call() throws Exception {
-		Random generator = new Random();
-		
-		while(stop.get() == false) {
-			//int delay = generator.nextInt(190 + 1) + 10;
-			int value = generator.nextInt(B + 1);
-			//Thread.sleep(delay);
+	public void run() {
+		try {
+			Random generator = new Random();
 			
-			for(Buffer b: buffers) {
-				b.add(value);
+			System.out.println("Collecting data...");
+			
+			int num = 0;
+			
+			while(stop.get() == false) {
+				//int delay = generator.nextInt(190 + 1) + 10;
+				int value = generator.nextInt(B + 1);
+				//Thread.sleep(delay);
+				
+				for(Buffer b: buffers) {
+					b.add(value);
+				}
+				
+				if(num % 1000 == 0)
+					System.out.printf("num = %d\n", num);
+				
+				num++;
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		
-		return "Finished collecting data...";
 	}
 }

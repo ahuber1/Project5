@@ -1,13 +1,11 @@
 package hubble;
 
-import java.util.concurrent.Callable;
-
 /**
  * Receives input from a Buffer
  * @author Andrew Huber
  *
  */
-public class Reciever implements Callable<String> {
+public class Reciever implements Runnable {
 	
 	/** Buffer B1 as specified by the project document */
 	private Buffer b1;
@@ -30,23 +28,26 @@ public class Reciever implements Callable<String> {
 	}
 	
 	@Override
-	public String call() throws Exception {
-		while(b1.size() < (b1.length() / 2))
-			Thread.sleep(2000);
-		
-		System.out.println("Buffer.java: b1 is now big enough! Begin data retrieval...");
-		
-		int val;
-		boolean loop;
-		
-		do {
-			val = b1.remove();
-			loop = b2.add(val);
+	public void run() {
+		try {
+			while(b1.size() < (b1.length() / 2)) {
+				Thread.sleep(1000 * 60);
+			}
 			
-		} while(loop == true);
-		
-		proc.processData();
-		
-		return "Done recieving...";
+			System.out.println("Buffer.java: b1 is now big enough! Begin data retrieval...");
+			
+			int val;
+			boolean loop;
+			
+			do {
+				val = b1.remove();
+				loop = b2.add(val);
+				
+			} while(loop == true);
+			
+			proc.processData();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

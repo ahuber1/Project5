@@ -31,7 +31,7 @@ public class Buffer {
 	 * @return {@code true} if {@code i} was successfully added to the buffer because there was room
 	 * for it, {@code false} if {@code i} was unsuccessfully added to the buffer because there was no room.
 	 */
-	public synchronized boolean add(int i) {
+	public boolean add(int i) {
 		if(buffer.size() == size.get())
 			return false;
 		else {
@@ -44,7 +44,7 @@ public class Buffer {
 	 * Removes an {@code int} from the head of the buffer
 	 * @return The {@code int} from the head of the buffer or -1 if there is nothing to remove
 	 */
-	public synchronized int remove() {
+	public int remove() {
 		
 		Integer val = buffer.remove();
 		
@@ -58,7 +58,7 @@ public class Buffer {
 	 * Returns the number of items in this buffer
 	 * @return the number of items in this buffer
 	 */
-	public synchronized int size() {
+	public int size() {
 		return buffer.size();
 	}
 	
@@ -68,7 +68,7 @@ public class Buffer {
 	 * @return an {@link AtomicIntegerArray} of all the numbers stored in the buffer
 	 * at a particular moment
 	 */
-	public synchronized AtomicIntegerArray toArray() {
+	public AtomicIntegerArray toArray() {
 		Integer[] intArr = buffer.toArray(new Integer[buffer.size()]);
 		AtomicIntegerArray atomArr = new AtomicIntegerArray(intArr.length);
 		
