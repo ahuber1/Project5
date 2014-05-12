@@ -1,8 +1,12 @@
 package hubble;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.WritableRaster;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.attribute.FileTime;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
 import javax.imageio.ImageIO;
@@ -26,7 +30,7 @@ public class Processor {
 	private int n;
 	
 	/** The data in B2 as an {@link AtomicIntegerArray} */
-	private AtomicIntegerArray data;
+	private int[] data;
 	
 	/** Will contain the normalized data */
 	private byte[] bytes;
@@ -59,37 +63,50 @@ public class Processor {
 	 * </ol>
 	 */
 	public void processData() {
-		try {
-			System.out.println("Processing data...");			
+		try {		
+			System.out.println("Starting sort...");
+			
 			long startTime = System.currentTimeMillis();
 			data = Sorter.mergesort(b2.toArray(), t);
-			System.out.println("Done sorting...");
-				
 			long diff = System.currentTimeMillis() - startTime;
 			
-			sortTime = diff / 1000.0;			
-			bytes = new byte[data.length()];
+			System.out.printf("It took %d seconds to sort\n", diff);			
 			
+			sortTime = diff / 1000.0;			
+			bytes = new byte[data.length];
+			
+			System.out.println("Starting normalization...");
 			normalize();
-			System.out.println("Normalized...");
+			System.out.println("Done normalization!");
 			
 			File file = new File("images");
 			
 			if(file.exists() == false)
-				file.mkdir();			
+				file.mkdir();
 			
 			path = String.format("images/output_N%d_T%d.jpg", n, t);
 			file = new File(path);
 			
-			if(file.exists() == false)
-				file.createNewFile();
+			if(file.exists())
+				file.delete();
 			
-			BufferedImage image = ImageIO.read(new ByteArrayInputStream(bytes));
-			ImageIO.write(image, "jpg", file);
+			ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+			BufferedImage image = new BufferedImage((int) Math.sqrt(bytes.length),
+					(int) Math.sqrt(bytes.length), BufferedImage.TYPE_BYTE_GRAY);
+			WritableRaster raster = image.getRaster();
+					
+			for(int i = 0; i < image.getHeight(); i++) {
+				for(int j = 0; j < image.getHeight(); j++) {
+					raster.setPixel(i, j, new double[] {bais.read()});
+				}
+			}
+			
+			ImageIO.write(image, "jpg", file);			
+			System.out.println("Wrote " + file.getAbsolutePath());			
 		}
 		catch (Exception e) {
+			System.err.println("Caught error...");
 			e.printStackTrace();
-			System.exit(-1);
 		}
 	}
 	
@@ -101,14 +118,9 @@ public class Processor {
 	 * video
 	 */
 	private void normalize() {
-		final int A = Collector.A;
-		final int B = Collector.B;
-		final int a = Byte.MIN_VALUE; 
-		final int b = Byte.MAX_VALUE;
-		
 		for(int i = 0; i < bytes.length; i++) {
-			int x = data.get(i);
-			int v = a + (((x - A) * (b - a))/(B - a));
+			int x = data[i];
+			int v = (int) Math.floor(x * (255.0 / 4096.0));
 			bytes[i] = (byte) v;
 		}
 	}

@@ -30,11 +30,9 @@ public class Reciever implements Runnable {
 	@Override
 	public void run() {
 		try {
-			while(b1.size() < (b1.length() / 2)) {
-				Thread.sleep(1000 * 60);
+			while(b1.num() < (b1.length() / 2)) {
+				Thread.sleep(1000);
 			}
-			
-			System.out.println("Buffer.java: b1 is now big enough! Begin data retrieval...");
 			
 			int val;
 			boolean loop;
@@ -47,6 +45,7 @@ public class Reciever implements Runnable {
 			
 			proc.processData();
 		} catch (Exception e) {
+			System.err.println("My catch!");
 			e.printStackTrace();
 		}
 	}

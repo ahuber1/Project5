@@ -10,19 +10,21 @@ import java.util.concurrent.atomic.AtomicIntegerArray;
  *
  */
 public class Buffer {
-	/** The actual buffer */
-	private ConcurrentLinkedQueue<Integer> buffer;
 	
-	/** The maximum size of this buffer */
-	private AtomicInteger size;
+	private int[] buffer;
+	private int head;
+	private int tail;
+	private int num;
 	
 	/**
 	 * Creates a new Buffer of a particular size
 	 * @param size the size of the buffer
 	 */
 	public Buffer(int size) {
-		this.size = new AtomicInteger(size);
-		this.buffer = new ConcurrentLinkedQueue<Integer>();
+		buffer = new int[size];
+		head = 0;
+		tail = 0;
+		num = 0;
 	}
 	
 	/**
@@ -31,35 +33,44 @@ public class Buffer {
 	 * @return {@code true} if {@code i} was successfully added to the buffer because there was room
 	 * for it, {@code false} if {@code i} was unsuccessfully added to the buffer because there was no room.
 	 */
-	public boolean add(int i) {
-		if(buffer.size() == size.get())
+	public synchronized boolean add(int i) {
+		if(num == buffer.length)
 			return false;
 		else {
-			buffer.add(i);
+			buffer[tail] = i;
+			tail = increment(tail);
+			num++;
 			return true;
 		}
+	}
+	
+	private int increment(int val) {
+		if(val + 1 == buffer.length)
+			return 0;
+		else
+			return val + 1;
 	}
 	
 	/**
 	 * Removes an {@code int} from the head of the buffer
 	 * @return The {@code int} from the head of the buffer or -1 if there is nothing to remove
 	 */
-	public int remove() {
+	public synchronized int remove() {
+		if(num == 0)
+			throw new RuntimeException("Nothing to remove!");
 		
-		Integer val = buffer.remove();
-		
-		if(val != null)
-			return val;
-		else
-			return -1;
+		int val = buffer[head];
+		head = increment(head);
+		num--;
+		return val;
 	}
 	
 	/**
 	 * Returns the number of items in this buffer
 	 * @return the number of items in this buffer
 	 */
-	public int size() {
-		return buffer.size();
+	public synchronized int num() {
+		return num;
 	}
 	
 	/**
@@ -68,15 +79,13 @@ public class Buffer {
 	 * @return an {@link AtomicIntegerArray} of all the numbers stored in the buffer
 	 * at a particular moment
 	 */
-	public AtomicIntegerArray toArray() {
-		Integer[] intArr = buffer.toArray(new Integer[buffer.size()]);
-		AtomicIntegerArray atomArr = new AtomicIntegerArray(intArr.length);
+	public synchronized int[] toArray() {
+		int[] arr = new int[num];
 		
-		for(int i = 0; i < intArr.length; i++) {
-			 atomArr.set(i, intArr[i].intValue());
-		}
+		for(int i = 0, h = head; i < arr.length; i++, h = increment(h))
+			arr[i] = buffer[h];
 		
-		return atomArr;
+		return arr;
 	}
 	
 	@Override
@@ -84,7 +93,7 @@ public class Buffer {
 		return "TBD";
 	}
 
-	public int length() {
-		return size.get();
+	public synchronized int length() {
+		return buffer.length;
 	}
 }
