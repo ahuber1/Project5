@@ -12,7 +12,7 @@ public class Sorter {
 	}
 	
 	private static void mergesort(int[] array, int t, int min, int max) {
-		if(max - min <= t)
+		if(max - min + 1 <= t)
 			insertionsort(array, min, max);
 		else {			
 			int mid = (min + max) / 2;

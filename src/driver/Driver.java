@@ -2,8 +2,8 @@ package driver;
 
 import java.text.DecimalFormat;
 
-import hubble.Buffer;
-import hubble.Collector;
+import hubble.IntegerBuffer;
+import hubble.Satellite;
 import hubble.Reciever;
 
 public class Driver {
@@ -27,31 +27,36 @@ public class Driver {
 			// All the possible values for j
 			int[] j = {1, 2, 3, 4, 5};
 			
-			for(int x = 0, run = 1; x < i.length; x++) {
-				int n = (int) Math.pow(2, i[x]);
-				Buffer b1 = new Buffer(n * n * 2);
-				Collector collector = new Collector(b1);
-				Thread collectorThread = new Thread(collector);
-				collectorThread.start();
+			// For every possible i
+			for(int iIndex = 0, runNum = 1; iIndex < i.length; iIndex++) {
+				int n = (int) Math.pow(2, i[iIndex]);
+				IntegerBuffer b1 = new IntegerBuffer(n * n * 2);
+				Satellite satellite = new Satellite(b1);
+				Thread satelliteThread = new Thread(satellite);
 				
-				for(int y = 0; y < j.length; y++, run++) {
-					int t = (int) Math.pow(10, j[y]);
-					Buffer b2 = new Buffer(n * n);
+				satelliteThread.start();
+				
+				for(int jIndex = 0; jIndex < j.length; jIndex++, runNum++) {
+					int t = (int) Math.pow(10, j[jIndex]);
+					IntegerBuffer b2 = new IntegerBuffer(n * n);
 					Reciever rec = new Reciever(b1, b2, n, t);
 					Thread recThread = new Thread(rec);
 					
-					recThread.start();
-					recThread.join();
+					recThread.start(); // start the receiving & processing
+					recThread.join(); // wait for the receiving & processing to finish
 					
 					System.out.printf("Run #%d: i=%d,j=%d,N=%d,B1=%d,B2=%d,T=%d\n", 
-							run, i[x], j[y], n, b1.num(), b2.num(), t);
+							runNum, i[iIndex], j[jIndex], n, b1.num(), b2.num(), t);
+					
 					System.out.printf("Time mergesort: %dms\n", rec.mergesortTime());
+					
 					System.out.printf("Saving image: %s\n", rec.getFileName());
+					
 					System.out.println();
 				}
 				
-				collector.stop();
-				collectorThread.join();
+				satellite.stop(); // "tell" the satellite to stop collecting data
+				satelliteThread.join(); // wait for the satellite thread to finish
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

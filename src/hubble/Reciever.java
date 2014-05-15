@@ -8,10 +8,10 @@ package hubble;
 public class Reciever implements Runnable {
 	
 	/** Buffer B1 as specified by the project document */
-	private Buffer b1;
+	private IntegerBuffer b1;
 	
 	/** Buffer B2 as specified by the project document */
-	private Buffer b2;
+	private IntegerBuffer b2;
 	
 	private Processor proc;
 	
@@ -21,7 +21,7 @@ public class Reciever implements Runnable {
 	 * @param b2 buffer B2 as specified by the project document
 	 * @param n the value N as specified by the project document
 	 */
-	public Reciever(Buffer b1, Buffer b2, int n, int t) {
+	public Reciever(IntegerBuffer b1, IntegerBuffer b2, int n, int t) {
 		this.b1 = b1;
 		this.b2 = b2;
 		proc = new Processor(b2, t, n);
@@ -51,7 +51,7 @@ public class Reciever implements Runnable {
 	}
 
 	public long mergesortTime() {
-		return proc.time();
+		return proc.b2.mergesortTime(proc);
 	}
 
 	public String getFileName() {
