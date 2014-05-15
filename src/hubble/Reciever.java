@@ -49,4 +49,12 @@ public class Reciever implements Runnable {
 			e.printStackTrace();
 		}
 	}
+
+	public long mergesortTime() {
+		return proc.time();
+	}
+
+	public String getFileName() {
+		return proc.path();
+	}
 }

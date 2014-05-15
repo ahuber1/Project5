@@ -42,29 +42,54 @@ public class Sorter {
 				}
 			}
 			
-			insertionsort(array, min, max);
+			merge(array, min, mid, max);
 		}
 	}
 	
+	private  static void merge(int[] array, int min, int mid, int max) {
+		
+		int[] a = new int[max - min + 1];
+		
+		for(int i = 0, l = min, r = mid + 1; i < a.length; i++, l++, r++) {
+			
+			if(l == mid + 1) {
+				a[i] = array[r];
+				l--;
+			}
+			else if(r == max + 1) {
+				a[i] = array[l];
+				r--;
+			}
+			else if(array[l] < array[r]) {
+				a[i] = array[l];
+				r--;
+			}
+			else {
+				a[i] = array[r];
+				l--;
+			}
+			
+		}
+		
+		for(int i = 0, m = min; i < a.length; i++, m++)
+			array[m] = a[i];
+	}
+
 	/**
 	 * Performs insertion sort on {@link Processor#data} between {@code min} and
 	 * @param min an index number serving as the lower bounds
 	 * @param max an index number serving as the upper bounds
 	 */
-	private synchronized static void insertionsort(int[] array, int min, int max) {
-		System.out.println("\tStarting insertion sort...");
-		
+	private synchronized static void insertionsort(int[] array, int min, int max) {		
 		for(int i = min; i <= max; i++) {
 			for(int j = i; j <= max; j++) {
-				if(array[j] > array[i]) {
+				if(array[j] < array[i]) {
 					int temp = array[i];
 					array[i] = array[j];
 					array[j] = temp;
 				}
 			}
 		}
-		
-		System.out.println("\tFinished insertion sort");
 	}
 	
 	private static class SortTask implements Callable<String>, Runnable {

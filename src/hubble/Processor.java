@@ -36,7 +36,7 @@ public class Processor {
 	private byte[] bytes;
 	
 	/** Will store the amount of time in seconds it took to sort the data */
-	private double sortTime;
+	private long sortTime;
 	
 	/** Will contain the file path of where the image is stored */
 	private String path;
@@ -63,21 +63,17 @@ public class Processor {
 	 * </ol>
 	 */
 	public void processData() {
-		try {		
-			System.out.println("Starting sort...");
-			
+		try {
 			long startTime = System.currentTimeMillis();
 			data = Sorter.mergesort(b2.toArray(), t);
-			long diff = System.currentTimeMillis() - startTime;
+			long diff = System.currentTimeMillis() - startTime;			
 			
-			System.out.printf("It took %d seconds to sort\n", diff);			
-			
-			sortTime = diff / 1000.0;			
+			sortTime = diff / 1000;			
 			bytes = new byte[data.length];
 			
-			System.out.println("Starting normalization...");
+			//System.out.println("Starting normalization...");
 			normalize();
-			System.out.println("Done normalization!");
+			//System.out.println("Done normalization!");
 			
 			File file = new File("images");
 			
@@ -102,7 +98,6 @@ public class Processor {
 			}
 			
 			ImageIO.write(image, "jpg", file);			
-			System.out.println("Wrote " + file.getAbsolutePath());			
 		}
 		catch (Exception e) {
 			System.err.println("Caught error...");
@@ -129,7 +124,7 @@ public class Processor {
 	 * Returns the amount of time it took to sort the data in seconds
 	 * @return the amount of time it took to sort the data in seconds
 	 */
-	public double time() {
+	public long time() {
 		return sortTime;
 	}
 	
