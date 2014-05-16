@@ -46,17 +46,18 @@ public class Driver {
 					recThread.join(); // wait for the receiving & processing to finish
 					
 					System.out.printf("Run #%d: i=%d,j=%d,N=%d,B1=%d,B2=%d,T=%d\n", 
-							runNum, i[iIndex], j[jIndex], n, b1.num(), b2.num(), t);
+							runNum, i[iIndex], j[jIndex], n, b1.size(), b2.size(), t);
 					
-					System.out.printf("Time mergesort: %dms\n", rec.mergesortTime());
+					System.out.printf("Time mergesort: %dms\n", rec.getMergesortTime());
 					
-					System.out.printf("Saving image: %s\n", rec.getFileName());
+					System.out.printf("Saving image: %s\n", rec.getRelativeFilePath());
 					
 					System.out.println();
 				}
 				
 				satellite.stop(); // "tell" the satellite to stop collecting data
 				satelliteThread.join(); // wait for the satellite thread to finish
+				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

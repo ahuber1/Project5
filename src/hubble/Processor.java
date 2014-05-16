@@ -9,13 +9,13 @@ import javax.imageio.ImageIO;
 import util.Sorter;
 
 /**
- * Processes the data that a {@link Reciever} recieved
+ * Processes the data that a {@link Reciever} received
  * @author Andrew Huber
  */
 public class Processor {
 
 	/** The second buffer, B2, as specified in the project document */
-	IntegerBuffer b2;
+	private IntegerBuffer b2;
 	
 	/** The value T, as specified in the project document */
 	private int t;
@@ -29,11 +29,11 @@ public class Processor {
 	/** Will contain the normalized data */
 	private int[] normalized;
 	
-	/** Will store the amount of time in seconds it took to sort the data */
-	long sortTime;
-	
 	/** Will contain the file path of where the image is stored */
 	private String path;
+	
+	/** Keeps track of how long it took to perform merge sort on the data in milliseconds */
+	private long mergesortTime;
 	
 	/**
 	 * Creates an object that will process the data that a {@link Reciever} recieved 
@@ -60,9 +60,8 @@ public class Processor {
 		try {
 			long startTime = System.currentTimeMillis();
 			data = Sorter.mergesort(b2.toArray(), t);
-			long diff = System.currentTimeMillis() - startTime;			
-			
-			sortTime = diff / 1000;			
+			mergesortTime = System.currentTimeMillis() - startTime;			
+						
 			normalized = new int[data.length];
 			
 			normalize();
@@ -116,7 +115,15 @@ public class Processor {
 	 * Returns the relative path of where the saved image is stored
 	 * @return the relative path of where the saved image is stored
 	 */
-	public String path() {
+	public String getRelativeFilePath() {
 		return path;
+	}
+	
+	/** 
+	 * Returns the amount of time it took to sort the data in milliseconds
+	 * @return the amount of time it took to sort the data in milliseconds 
+	 */
+	public long getMergesortTime() {
+		return mergesortTime;
 	}
 }

@@ -2,8 +2,6 @@ package hubble;
 
 import java.util.Random;
 
-// TODO see if we should rename this to "Satellite"
-
 /**
  * This generates random numbers and stores them in a buffer, which simulates
  * data transmission with the Hubble Space Telescope
@@ -12,6 +10,7 @@ import java.util.Random;
  */
 public class Satellite implements Runnable {
 	
+	/** The Buffer B1 as mentioned in the project document */
 	private IntegerBuffer b1;	
 	
 	/** Keeps track of when the data generation process should stop */
@@ -29,10 +28,14 @@ public class Satellite implements Runnable {
 	/**
 	 * Stops the data generation process
 	 */
-	public synchronized void stop() {
+	public void stop() {
 		stop = true;
 	}
 
+	/**
+	 * Begins generating random integers between 0 and 4096
+	 * and places them in the Buffer
+	 */
 	@Override
 	public void run() {
 		try {
@@ -41,7 +44,7 @@ public class Satellite implements Runnable {
 			while(stop == false) {
 				int value = generator.nextInt(4096 + 1);
 			
-				while(b1.add(value) == false)
+				while(b1.add(value) == false && stop == false)
 					Thread.sleep(1000);
 			}
 		} catch (Exception e) {

@@ -19,11 +19,11 @@ public class IntegerBuffer {
 	private volatile int num;
 	
 	/**
-	 * Creates a new {@code IntegerBuffer} of a particular size
-	 * @param size the size of the buffer
+	 * Creates a new {@code IntegerBuffer} of a particular length
+	 * @param length the length of the buffer
 	 */
-	public IntegerBuffer(int size) {
-		buffer = new int[size];
+	public IntegerBuffer(int length) {
+		buffer = new int[length];
 		head = 0;
 		tail = 0;
 		num = 0;
@@ -41,7 +41,7 @@ public class IntegerBuffer {
 			return false;
 		else {
 			buffer[tail] = i;
-			tail = increment(tail);
+			tail = wrapAroundIncrement(tail);
 			num++;
 			return true;
 		}
@@ -57,7 +57,7 @@ public class IntegerBuffer {
 	 * @param val The value to increment
 	 * @return
 	 */
-	private int increment(int val) {
+	private int wrapAroundIncrement(int val) {
 		if(val + 1 == buffer.length)
 			return 0;
 		else
@@ -74,7 +74,7 @@ public class IntegerBuffer {
 			throw new RuntimeException("Nothing to remove!");
 		
 		int val = buffer[head];
-		head = increment(head);
+		head = wrapAroundIncrement(head);
 		num--;
 		return val;
 	}
@@ -83,7 +83,7 @@ public class IntegerBuffer {
 	 * Returns the number of items in this buffer
 	 * @return the number of items in this buffer
 	 */
-	public synchronized int num() {
+	public int size() {
 		return num;
 	}
 	
@@ -93,10 +93,10 @@ public class IntegerBuffer {
 	 * @return an array of all the numbers stored in the buffer
 	 * at a particular moment
 	 */
-	public synchronized int[] toArray() {
+	public int[] toArray() {
 		int[] arr = new int[num];
 		
-		for(int i = 0, h = head; i < arr.length; i++, h = increment(h))
+		for(int i = 0, h = head; i < arr.length; i++, h = wrapAroundIncrement(h))
 			arr[i] = buffer[h];
 		
 		return arr;
@@ -107,16 +107,7 @@ public class IntegerBuffer {
 	 * buffer)
 	 * @return the length of this buffer
 	 */
-	public synchronized int length() {
+	public int length() {
 		return buffer.length;
-	}
-
-	/**
-	 * Returns the amount of time it took to sort the data in seconds
-	 * @param processor TODO
-	 * @return the amount of time it took to sort the data in seconds
-	 */
-	public long mergesortTime(Processor processor) {
-		return processor.sortTime;
 	}
 }

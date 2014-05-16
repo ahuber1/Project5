@@ -27,10 +27,14 @@ public class Reciever implements Runnable {
 		proc = new Processor(b2, t, n);
 	}
 	
+	/**
+	 * Waits for the buffer to be half full and then adds those elements
+	 * into another buffer, which is subsequently processed into images. 
+	 */
 	@Override
 	public void run() {
 		try {
-			while(b1.num() < (b1.length() / 2)) {
+			while(b1.size() < (b1.length() / 2)) {
 				Thread.sleep(1000);
 			}
 			
@@ -50,11 +54,19 @@ public class Reciever implements Runnable {
 		}
 	}
 
-	public long mergesortTime() {
-		return proc.b2.mergesortTime(proc);
+	/** 
+	 * Returns the relative file path of the image that was generated
+	 * @return the relative file path of the image that was generated
+	 */
+	public String getRelativeFilePath() {
+		return proc.getRelativeFilePath();
 	}
-
-	public String getFileName() {
-		return proc.path();
+	
+	/**
+	 * Returns the amount of time it took to sort the image in milliseconds
+	 * @return the amount of time it took to sort the image in milliseconds
+	 */
+	public long getMergesortTime() {
+		return proc.getMergesortTime();
 	}
 }
